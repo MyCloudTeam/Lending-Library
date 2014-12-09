@@ -1,5 +1,6 @@
 <?php
 include_once 'psl-config.php';
+include_once 'db_connect.php';
  
  //Securely start a PHP session
 function sec_session_start() {
@@ -22,7 +23,9 @@ function sec_session_start() {
     // Sets the session name to the one set above.
     session_name($session_name);
     session_start();            // Start the PHP session 
+        // var_dump($_SESSION);
     session_regenerate_id();    // regenerated the session, delete the old one.
+
 	
 	
 	//Create the Login Function
@@ -39,9 +42,20 @@ function sec_session_start() {
         // get variables from result.
         $stmt->bind_result($user_id, $user_name, $db_password, $salt);
         $stmt->fetch();
+
+        if($e_sl = $mysqli->query("SELECT check_status FROM user_confirmation WHERE user_id = $user_id")){
+            $ex_sl=$e_sl->fetch_assoc();
+            if($e_sl->num_rows == 1){
+                if($ex_sl['check_status'] == 0){
+                    echo json_encode(array('success'=>0, 'error_id'=>3, 'error_msg'=>'Account has to be activated. <a href="../confirmSignUp.php">Click Here </a> to enter the code sent to your Email and Activate'));
+                    die();
+                }
+            }
+        }
  
         // hash the password with the unique salt.
         $password = hash('sha512', $password . $salt);
+        // echo "<br/>".$db_password;
         if ($stmt->num_rows == 1) {
              // Check if the password in the database matches
             // the password the user submitted.
@@ -64,9 +78,9 @@ function sec_session_start() {
             } else {
                 // Password is not correct
                 // We record this attempt in the database
-                $now = time();
-                $mysqli->query("INSERT INTO login_attempts(user_id, time)
-                                VALUES ('$user_id', '$now')");
+                // $now = time();
+                // $mysqli->query("INSERT INTO login_attempts(user_id, time)
+                                // VALUES ('$user_id', '$now')");
                 return false;
             }
 
@@ -93,7 +107,7 @@ function login_check($mysqli) {
  
         if ($stmt = $mysqli->prepare("SELECT password 
                                       FROM users 
-                                      WHERE id = ? LIMIT 1")) {
+                                      WHERE user_id = ? LIMIT 1")) {
             // Bind "$user_id" to parameter. 
             $stmt->bind_param('i', $user_id);
             $stmt->execute();   // Execute the prepared query.
@@ -104,23 +118,29 @@ function login_check($mysqli) {
                 $stmt->bind_result($password);
                 $stmt->fetch();
                 $login_check = hash('sha512', $password . $user_browser);
+                $login_string;
  
                 if ($login_check == $login_string) {
+                    // echo "yes";
                     // Logged In!!!! 
                     return true;
                 } else {
+                    // echo "check failed";
                     // Not logged in 
                     return false;
                 }
             } else {
+                // echo "more rows";
                 // Not logged in 
                 return false;
             }
         } else {
+            // echo "stmt_prep_err";
             // Not logged in 
             return false;
         }
     } else {
+        // echo "session not set";
         // Not logged in 
         return false;
     }
