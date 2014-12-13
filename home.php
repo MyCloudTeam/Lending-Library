@@ -48,7 +48,7 @@ sec_session_start();
                     <div class="navbar-collapse collapse">
                         <ul class="nav navbar-nav pull-right">
                             <li class="active"><a href="#">Home</a></li>
-                            <li><a href="about.html">Profile</a></li>
+                            <li><a href="profile.php">Profile</a></li>
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">More Pages <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
@@ -57,7 +57,7 @@ sec_session_start();
                                 </ul>
                             </li>
                             <li><a href="contact.html">Contact</a></li>
-                            <li><a class="btn" href="signin.html">LOG OUT</a></li>
+                            <li><a class="btn" href="includes/logout.php">LOG OUT</a></li>
                         </ul>
                     </div><!--/.nav-collapse -->
                 </div>
