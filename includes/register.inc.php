@@ -136,3 +136,17 @@ if (isset($_POST['username'], $_POST['email'], $_POST['p'])) {
     else
         echo json_encode(array('success'=>0,'error_id'=>6,'error_msg'=>$error_msg));
 }
+elseif (isset($_POST['username'], $_POST['email'], $_POST['auth']){
+    if($_POST['auth']=="fb" OR $_POST['auth']=="g"){
+        if ($insert_stmt = $mysqli->query("INSERT INTO users (user_name, email, auth, active) VALUES ('$username', '$email', '$auth', 1)")) {
+            echo json_encode(array('success'=>1,'user_id'=>$mysqli->insert_id));
+        }
+        else
+            echo json_encode(array('success'=>0, 'error_id'=>3, 'error_msg'=>'Insert failed'));
+    }
+    else{
+        echo json_encode(array('success'=>0, 'error_id'=>7, 'error_msg'=>'Required fields not set'));
+    }
+}
+else
+    echo json_encode(array('success'=>0, 'error_id'=>7, 'error_msg'=>'Required fields not set'));
