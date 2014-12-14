@@ -1,9 +1,10 @@
 <?php
 
-	require_once 'db_connect.php';
-	include_once 'functions.php';
-
-	sec_session_start();
+	if(session_status() != PHP_SESSION_ACTIVE){
+		require_once 'db_connect.php';
+		include_once 'functions.php';
+		sec_session_start();
+	}
 
 	function check_friendship($mysqli, $cur_user_id, $other_user_id){
 		$fcheckquery = mysqli_query($mysqli,"SELECT DISTINCT from_user_id,to_user_id,accept FROM friends WHERE to_user_id='".$cur_user_id."' AND from_user_id='".$other_user_id."'
@@ -11,7 +12,7 @@
 											  SELECT DISTINCT from_user_id,to_user_id,accept FROM friends WHERE from_user_id='".$cur_user_id."' AND to_user_id='".$other_user_id."'");
 
 		$fcheck=mysqli_num_rows($fcheckquery);
-		$friendship="none";
+		$friendship= NULL;
 
 		if($fcheck){
 			while($fcrow=mysqli_fetch_array($fcheckquery)){
@@ -28,7 +29,7 @@
 			}
 		}
 		else
-			return FALSE;
+			return NULL;
 	}
 
 	function send_friend_request($mysqli, $other_user_id){
