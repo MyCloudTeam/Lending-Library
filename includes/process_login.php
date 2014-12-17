@@ -3,9 +3,17 @@ include_once 'db_connect.php';
 include_once 'functions.php';
  
 sec_session_start(); // Our custom secure way of starting a PHP session.
+
+// $_POST['user_email']='krishnatejac@gmail.com';
+// $_POST['p']='oauth';
+
+if (isset($_POST['user_email'],$_POST['user_auth'])) {
+    $_POST['p'] = 'oauth';
+}
+
  
-if (isset($_POST['email'], $_POST['p'])) {
-    $email = $_POST['email'];
+if (isset($_POST['user_email'], $_POST['p'])) {
+    $email = $_POST['user_email'];
     $password = $_POST['p']; // The hashed password.
  
     if (login($email, $password, $mysqli) == true) {
@@ -21,9 +29,11 @@ if (isset($_POST['email'], $_POST['p'])) {
             echo json_encode(array('success'=>0, 'error_id'=>1, 'error_msg'=>'Login failed'));
         }
         else
-            header('Location: ../index.php?error=1');
+            // header('Location: ../index.php?error=1');
+            echo "error";
     }
-} else {
+}
+else {
     // The correct POST variables were not sent to this page. 
     echo json_encode(array('success'=>0, 'error_id'=>2, 'error_msg'=>'Invalid Request'));
 }

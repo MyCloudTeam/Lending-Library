@@ -2,6 +2,10 @@
 include_once 'db_connect.php';
 include_once 'psl-config.php';
 include_once 'send_mail.php';
+
+// $_POST['user_name'] = "krishna";
+// $_POST['user_email'] = "krishnateja@gmail.com";
+// $_POST['user_auth']='g';
  
 $error_msg = "";
 
@@ -14,9 +18,21 @@ function user_confirmation($mysqli, $email){
     $code = rand(1000,9999);
     if(isset($email) && isset($code)){
 
-        if($slct = $mysqli->query("SELECT user_id FROM users WHERE email = '$email'")){
+        if($slct = $mysqli->query("SELECT user_id, auth FROM users WHERE email = '$email'")){
             $u_slct = $slct->fetch_assoc();
+
+            if(count($u_slct)==0){
+                echo json_encode(array('success'=>0, 'error_id'=>2, 'error_msg'=>'User doesnot exist'));
+                die();
+            }
+
             if($user_id = $u_slct['user_id']){
+
+                if($u_slct['auth']=="g" OR $u_slct['auth']=="fb"){
+                    echo json_encode(array('success'=>1,'user_id'=>$user_id));
+                    die();
+                }
+
                 if($e_sl = $mysqli->query("SELECT user_id, confirmation_code, check_status FROM user_confirmation WHERE user_id = $user_id")){
                     $ex_sl=$e_sl->fetch_assoc();
                     if($e_sl->num_rows == 1){
@@ -70,15 +86,32 @@ function user_confirmation($mysqli, $email){
             echo json_encode(array('success'=>0, 'error_id'=>1, 'error_msg'=>'fetch user_id failed'));
     }
 }
+
+if (isset($_POST['user_name'], $_POST['user_email'], $_POST['user_auth'])){
+    if($_POST['user_auth']=="fb" OR $_POST['user_auth']=="g"){
+        $_POST['p'] = "oauth";
+    }
+    else{
+        echo json_encode(array('success'=>0, 'error_id'=>7, 'error_msg'=>'Required fields not set'));
+        die();
+    }
+}
+
+if(isset($_POST['user_pic'])){
+    $user_pic = $_POST['user_pic'];
+}
+else{
+    $user_pic = "/assets/users/".rand(1,9).".jpg";
+}
  
-if (isset($_POST['username'], $_POST['email'], $_POST['p'])) {
+if (isset($_POST['user_name'], $_POST['user_email'], $_POST['p'])) {
     // echo "*****'$_POST['p'];
     // Sanitize and validate the data passed in
-    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
-    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+    $username = $_POST['user_name'];
+    $email = $_POST['user_email'];
     $email = filter_var($email, FILTER_VALIDATE_EMAIL);
-    if(isset($_POST['auth']))
-        $auth = $_POST['auth'];
+    if(isset($_POST['user_auth']))
+        $auth = $_POST['user_auth'];
     else
         $auth = "gen";
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -86,7 +119,7 @@ if (isset($_POST['username'], $_POST['email'], $_POST['p'])) {
         $error_msg .= '<p class="error">The email address you entered is not valid</p>';
     }
  
-    $password = filter_input(INPUT_POST, 'p', FILTER_SANITIZE_STRING);
+    $password = $_POST['p'];
     // if (strlen($password) != 128) {
     //     // The hashed pwd should be 128 characters long.
     //     // If it's not, something really odd has happened
@@ -135,18 +168,6 @@ if (isset($_POST['username'], $_POST['email'], $_POST['p'])) {
     }
     else
         echo json_encode(array('success'=>0,'error_id'=>6,'error_msg'=>$error_msg));
-}
-elseif (isset($_POST['username'], $_POST['email'], $_POST['auth']){
-    if($_POST['auth']=="fb" OR $_POST['auth']=="g"){
-        if ($insert_stmt = $mysqli->query("INSERT INTO users (user_name, email, auth, active) VALUES ('$username', '$email', '$auth', 1)")) {
-            echo json_encode(array('success'=>1,'user_id'=>$mysqli->insert_id));
-        }
-        else
-            echo json_encode(array('success'=>0, 'error_id'=>3, 'error_msg'=>'Insert failed'));
-    }
-    else{
-        echo json_encode(array('success'=>0, 'error_id'=>7, 'error_msg'=>'Required fields not set'));
-    }
 }
 else
     echo json_encode(array('success'=>0, 'error_id'=>7, 'error_msg'=>'Required fields not set'));
