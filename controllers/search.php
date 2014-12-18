@@ -15,30 +15,69 @@
     if(isset($_GET['query_string'])){
         $results = array();
 
-        // choose to search between categories
-        if(!isset($_GET['search_cat']))
-            $flag = TRUE;
-        else
-            $flag = FALSE;
-
-        // search for books and push into results
-        if($flag || $_GET['search_cat']=='books'){
-            if($b_res=search_books($mysqli, $_GET['query_string']))
-                array_push($results, $b_res);
+        if(isset($_GET['criterion'])){
+            $criterion = $_GET['criterion'];
+        }
+        else{
+            $criterion = NULL;
         }
 
-        // search for users and push into results
-        if($flag || $_GET['search_cat']=='users'){
-            if($u_res=search_users($mysqli, $_GET['query_string']))
-                array_push($results, $u_res);
+        // choose to search between categories
+        if(isset($_GET['search_cat'])){
+            // search for users and push into results
+            if($_GET['search_cat']=='users'){
+                // if($u_res=search_users($mysqli, $_GET['query_string']))
+                //     array_push($results, array('users'=>$u_res);
+                array_push($results, array('users'=>search_users($mysqli, $_GET['query_string'])));
+            }
+
+            // search for books and push into results
+            if($_GET['search_cat']=='books'){
+                // if($b_res=search_books($mysqli, $_GET['query_string'], $criterion))
+                //     array_push($results, search_users($mysqli, $_GET['query_string']));
+                array_push($results, array('books'=>search_books($mysqli, $_GET['query_string'], $criterion)));
+            }
+        }
+        else{
+            array_push($results, array('users'=>search_users($mysqli, $_GET['query_string'])));
+            array_push($results, array('books'=>search_books($mysqli, $_GET['query_string'], $criterion)));
         }
 
         echo json_encode(array('success'=>1, 'results'=>$results)); //results
     }
 
-    function search_books($mysqli, $query_string){
+    function search_books($mysqli, $query_string, $criterion=NULL){
+
+        if(isset($criterion)){
+            if($criterion == "title"){
+                $query = "SELECT * FROM books WHERE book_title LIKE '%$query_string%' AND privacy!='private'";
+            }
+            elseif($criterion == "author"){
+                $query = "SELECT * FROM books WHERE book_author LIKE '%$query_string%' AND privacy!='private'";
+            }
+            elseif($criterion == "isbn"){
+                $query = "SELECT * FROM books WHERE book_isbn LIKE '%$query_string%' AND privacy!='private'";
+            }
+            elseif($criterion == "uploader"){
+                //echo $query_string;
+                $query = "SELECT books.* FROM books natural join users WHERE user_name LIKE '%$query_string%' AND privacy!='private'";
+            }
+            else{
+                echo json_encode(array('success'=>0, 'error_id'=>4, 'error_msg'=>'The given criterion does NOT exist'));
+                die();
+            }
+        }
+        else{
+            $query = "(SELECT books.* FROM books WHERE book_title LIKE '%$query_string%'
+                        OR book_author LIKE '%$query_string%'
+                        OR book_isbn LIKE '%$query_string%'
+                        AND privacy!='private') UNION
+                        (SELECT books.* FROM books natural join users WHERE user_name LIKE '%$query_string%' AND privacy!='private')";
+        }
+
         $res = array();
-        if($b_sl = $mysqli->query("SELECT * FROM books WHERE book_title LIKE '%$query_string%'")){
+        // echo $query;
+        if($b_sl = $mysqli->query($query)){
             while($bk = $b_sl->fetch_assoc()){
                 $bk['result_type'] = 'book';
                 array_push($res,$bk);

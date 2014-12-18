@@ -63,20 +63,7 @@ sec_session_start();
                 </div>
             </div> 
             <!-- /.navbar -->
-
-                <!-- Main jumbotron for a primary marketing message or call to action -->
-                <header id="head">
-                    <div class="container">
-                        <div class="row col-md-offset-3">
-                            <!-- <div class="jumbotron" style="background-image: url(img/books.jpg)"> -->
-                            <!-- <div class="container"> -->
-                            <h1  style="color:black"><center>Cloud Pages</h1>
-                            <h4> <center class="text-muted">Library on the Cloud that let's you access all your books from anywhere</center></h4><br/><br/>
-                            <!-- Read and share your books. Anywhere | Anytime -->
-                            <center class="text-muted"><small>Not a Member yet? </small><a class="btn btn-primary btn-sm" role="button" href="register.php">Sign Up</a></center>
-                        </div>
-                    </div>
-                </header>
+                
             </div>
         </div>
 

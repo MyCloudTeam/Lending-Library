@@ -45,6 +45,8 @@ html {
 
 body {
   margin: 0;
+  background-image: url("bg.jpg");
+  background-repeat: repeat-y;
 }
 
 a {

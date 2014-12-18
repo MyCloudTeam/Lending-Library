@@ -3,15 +3,17 @@ include_once 'db_connect.php';
 include_once 'psl-config.php';
 include_once 'send_mail.php';
 
-// $_POST['user_name'] = "krishna";
-// $_POST['user_email'] = "krishnateja@gmail.com";
-// $_POST['user_auth']='g';
+// $_POST['user_name'] = "kaushik";
+// $_POST['user_email'] = "skb386@nyu.edu";
+// $_POST['user_auth']='gen';
+// $_POST['p']='hi';
  
 $error_msg = "";
 
 // check the verification code
 if(isset($_GET['email']) && isset($_GET['code'])){
     user_confirmation($mysqli, $_GET['email']);
+    die();
 }
 
 function user_confirmation($mysqli, $email){
@@ -45,22 +47,31 @@ function user_confirmation($mysqli, $email){
                                         if($insert_stmt1 = $mysqli->query("UPDATE users SET active=1 WHERE user_id=$user_id")){
                                             echo json_encode(array('success'=>1,'user_id'=>$user_id));
                                         }
-                                        else
+                                        else{
                                             echo json_encode(array('success'=>0, 'error_id'=>3, 'error_msg'=>'Activation failed'));
+                                            die();
+                                        }
+                                            
                                     }
-                                    else
+                                    else{
                                         echo json_encode(array('success'=>0, 'error_id'=>3, 'error_msg'=>'Check Status update failed'));
+                                        die();
+                                    }
                                 }
-                                else
+                                else{
                                     echo json_encode(array('success'=>0, 'error_id'=>5, 'error_msg'=>'Wrong verification code'));
+                                    die();
+                                }
                             }
                             else{
                                 $error_msg1 = 'Email has already been sent with the code. Didnot receive the mail?<a href=send_mail.php?email=$email&mail_type=confirmation>Resend</a>';
                                 echo json_encode(array('success'=>0, 'error_id'=>3, 'error_msg'=>$error_msg1));
+                                die();
                             }
                         }
                         else{
                             echo json_encode(array('success'=>0, 'error_id'=>4, 'error_msg'=>'Your account has been confirmed already. Please SignIn'));
+                            die();
                         }
                     }
                     else{
@@ -87,7 +98,7 @@ function user_confirmation($mysqli, $email){
     }
 }
 
-if (isset($_POST['user_name'], $_POST['user_email'], $_POST['user_auth'])){
+if (isset($_POST['user_name'], $_POST['user_email'], $_POST['user_auth']) && !isset($_POST['p'])){
     if($_POST['user_auth']=="fb" OR $_POST['user_auth']=="g"){
         $_POST['p'] = "oauth";
     }
@@ -104,7 +115,7 @@ else{
     $user_pic = "/assets/users/".rand(1,9).".jpg";
 }
  
-if (isset($_POST['user_name'], $_POST['user_email'], $_POST['p'])) {
+if (isset($_POST['user_name']) && isset($_POST['user_email']) && isset($_POST['p'])) {
     // echo "*****'$_POST['p'];
     // Sanitize and validate the data passed in
     $username = $_POST['user_name'];

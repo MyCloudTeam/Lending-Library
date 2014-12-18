@@ -6,6 +6,10 @@ include_once 'includes/functions.php';
 // include_once 'includes/nicetime.php';
 
 sec_session_start();
+
+if(!isset($_GET['user'])){
+  $_GET['user'] = $_SESSION['user_id'];
+}
 ?>
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -83,7 +87,7 @@ sec_session_start();
         <p class="lead">
           USER NAME<br/>
           UNIVERSITY<br/>
-          Works at XYZ corp.
+          1337 Uploads
         </p>
         <!-- <span class="text-muted">More >> </span>&nbsp;<a href="">Friends</a> , &nbsp;<a href="activities.php">Activities</a> -->
       </div>

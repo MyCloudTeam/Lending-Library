@@ -65,12 +65,12 @@ if (login_check($mysqli) == true) {
       <div class="navbar-collapse collapse">
         <form class="navbar-form navbar-right" role="form" action="includes/process_login.php" method="post" name="login_form">
           <div class="form-group">
-            <input type="text" placeholder="Email" name="email" class="form-control">
+            <input type="text" placeholder="Email" name="user_email" class="form-control">
           </div>
           <div class="form-group">
-            <input type="password" placeholder="Password" name="password" class="form-control">
+            <input type="password" placeholder="Password" name="p" class="form-control">
           </div>
-          <button type="submit" class="btn btn-success" onclick="formhash(this.form, this.form.password);">Sign in</button>
+          <button type="submit" class="btn btn-success">Sign in</button>
         </form>
       </div><!--/.navbar-collapse -->
     </div>

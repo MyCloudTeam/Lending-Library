@@ -8,8 +8,11 @@ sec_session_start(); // Our custom secure way of starting a PHP session.
 // $_POST['p']='oauth';
 
 if (isset($_POST['user_email'],$_POST['user_auth'])) {
-    $_POST['p'] = 'oauth';
+    if($_POST['user_auth']=='g' OR $_POST['user_auth']=='fb')
+        $_POST['p'] = 'oauth';
 }
+
+var_dump($_POST);
 
  
 if (isset($_POST['user_email'], $_POST['p'])) {
